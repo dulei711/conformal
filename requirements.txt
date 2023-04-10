@@ -1,0 +1,5 @@
+streamlit
+numpy
+Matplotlib
+Pillow
+sympy
