@@ -63,5 +63,5 @@ if image_file is not None:
     transformed_image = transform_image(image, func)
     
     # Display the original and transformed images
-    st.image([image, transformed_image
+    st.image([image, transformed_image], caption=['Original Image', 'Transformed Image'], width=300)
 
