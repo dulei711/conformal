@@ -58,10 +58,10 @@ func = func_options[func_name]
 if image_file is not None:
     # Load the image
     image = Image.open(image_file)
+    if st.button("Run"):
+        # Transform the image
+        transformed_image = transform_image(image, func)
     
-    # Transform the image
-    transformed_image = transform_image(image, func)
-    
-    # Display the original and transformed images
-    st.image([image, transformed_image], caption=['Original Image', 'Transformed Image'], width=300)
+        # Display the original and transformed images
+        st.image([image, transformed_image], caption=['Original Image', 'Transformed Image'], width=300)
 
