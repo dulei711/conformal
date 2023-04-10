@@ -1,5 +1,4 @@
 streamlit
 numpy
-Matplotlib
-Pillow
-sympy
+matplotlib
+cv2
