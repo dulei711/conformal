@@ -5,7 +5,7 @@ from PIL import Image
 import matplotlib.pyplot as plt
 
 def square(z):
-    return z**2
+    return z*z
 
 def sine(z):
     return sin(z)
