@@ -1,95 +1,64 @@
 import streamlit as st
+import cv2
 import numpy as np
-from sympy import *
-from PIL import Image
 import matplotlib.pyplot as plt
 
-def square(z):
-    return z*z
 
-def sine(z):
-    return sin(z)
+def conformal_mapping(img, func):
+    """Transforms the input image using a conformal mapping with the given complex function."""
+    # Get the size of the input image
+    rows, cols, _ = img.shape
 
-def logarithm(z):
-    return log(z)
-
-def exp(z):
-    return exp(z)
-
-def cos(z):
-    return cos(z)
-
-def tanh(z):
-    return tanh(z)
-
-def reciprocal(z):
-    return 1/z
-
-def mobius(z):
-    a, b, c, d = symbols('a b c d', real=True)
-    f = (a*z + b) / (c*z + d)
-    return simplify(f)
-
-
-def transform_image(image, func):
-    # Convert the image to a numpy array
-    img_array = np.array(image)
-    
-    # Get the height and width of the image
-    height, width = img_array.shape[:2]
-    
-    # Create a meshgrid of complex numbers that corresponds to the image pixels
-    x, y = np.meshgrid(np.linspace(-1, 1, width), np.linspace(-1, 1, height))
-    z = x + 1j*y
-    
-    # Apply the complex function to the meshgrid
+    # Compute the inverse mapping
+    x, y = np.meshgrid(np.arange(cols), np.arange(rows))
+    z = x + y * 1j
     w = func(z)
-    
-    # Convert the complex numbers back to x and y coordinates
-    x_new = np.real(w)
-    y_new = np.imag(w)
-    
-    # Map the x and y coordinates to the original image size
-    x_new = ((x_new + 1) / 2) * width
-    y_new = ((y_new + 1) / 2) * height
-    
-    # Interpolate the image to get the transformed image
-    transformed_image = np.zeros_like(img_array)
-    for i in range(3):
-        transformed_image[:,:,i] = np.interp(x_new.flatten(), np.arange(width), img_array[:,:,i].flatten()).reshape((height, width))
-    
-    # Convert the numpy array back to an image
-    transformed_image = Image.fromarray(transformed_image.astype('uint8'))
-    
-    return transformed_image
 
-st.title('Conformal Mapping Image Transformation')
+    # Convert the complex coordinates to image coordinates
+    u = np.real(w).astype(np.float32)
+    v = np.imag(w).astype(np.float32)
 
-# Upload the image
-image_file = st.file_uploader('Upload an image', type=['jpg', 'jpeg', 'png'])
+    # Apply the mapping to the input image
+    remapped = cv2.remap(img, u, v, cv2.INTER_LINEAR)
 
-# Select the conformal mapping function
-func_options = {
-    'Square': square,
-    'Sine': sine,
-    'Logarithm': logarithm,
-    'Exponential': exp,
-    'Cosine': cos,
-    'Hyperbolic Tangent': tanh,
-    'Reciprocal': reciprocal,
-    'Mobius': mobius
+    return remapped
+
+
+# Define the available complex functions
+functions = {
+    'Identity': lambda z: z,
+    'Sine': np.sin,
+    'Cosine': np.cos,
+    'Exponential': np.exp,
+    'Logarithm': np.log,
 }
 
-func_name = st.selectbox('Select a conformal mapping function', list(func_options.keys()))
-func = func_options[func_name]
 
+
+# Create the Streamlit app
+st.title('Conformal Mapping Photo Transformer')
+
+# Upload an image or use the default one
+image_file = st.file_uploader('Upload an image', type=['jpg', 'jpeg', 'png'])
 if image_file is not None:
-    # Load the image
-    image = Image.open(image_file)
-    if st.button("Run"):
-        # Transform the image
-        transformed_image = transform_image(image, func)
-    
-        # Display the original and transformed images
-        st.image([image, transformed_image], caption=['Original Image', 'Transformed Image'], width=300)
+    # Read the uploaded image
+    image = cv2.imdecode(np.frombuffer(image_file.read(), np.uint8), cv2.IMREAD_COLOR)
+    if st.button("run"):
 
+        # Display the original image
+        st.subheader('Original Image')
+        st.image(image, channels='BGR')
+
+        # Choose a complex function
+        function_name = st.selectbox('Select a complex function', list(functions.keys()))
+
+        # Apply the chosen function to the image
+        remapped_image = conformal_mapping(image, functions[function_name])
+
+        # Display the transformed image
+        st.subheader('Transformed Image')
+        st.image(remapped_image, channels='BGR')
+
+else:
+    # Read the default image
+    st.alert("no image uploaded")
