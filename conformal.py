@@ -31,6 +31,11 @@ functions = {
     'Cosine': np.cos,
     'Exponential': np.exp,
     'Logarithm': np.log,
+    'Square': lambda z: z**2,
+    'Square Root': np.sqrt,
+    'Reciprocal': lambda z: 1/z,
+    'Inverted Logarithm': lambda z: -np.log(1-z),
+    'Conjugate': np.conj
 }
 
 
