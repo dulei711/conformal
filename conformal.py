@@ -13,6 +13,24 @@ def sine(z):
 def logarithm(z):
     return log(z)
 
+def exp(z):
+    return exp(z)
+
+def cos(z):
+    return cos(z)
+
+def tanh(z):
+    return tanh(z)
+
+def reciprocal(z):
+    return 1/z
+
+def mobius(z):
+    a, b, c, d = symbols('a b c d', real=True)
+    f = (a*z + b) / (c*z + d)
+    return simplify(f)
+
+
 def transform_image(image, func):
     # Convert the image to a numpy array
     img_array = np.array(image)
@@ -51,7 +69,17 @@ st.title('Conformal Mapping Image Transformation')
 image_file = st.file_uploader('Upload an image', type=['jpg', 'jpeg', 'png'])
 
 # Select the conformal mapping function
-func_options = {'Square': square, 'Sine': sine, 'Logarithm': logarithm}
+func_options = {
+    'Square': square,
+    'Sine': sine,
+    'Logarithm': logarithm,
+    'Exponential': exp,
+    'Cosine': cos,
+    'Hyperbolic Tangent': tanh,
+    'Reciprocal': reciprocal,
+    'Mobius': mobius
+}
+
 func_name = st.selectbox('Select a conformal mapping function', list(func_options.keys()))
 func = func_options[func_name]
 
